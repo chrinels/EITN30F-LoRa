@@ -20,6 +20,21 @@ should output
 /dev/spidev0.0  /dev/spidev0.1  /dev/spidev1.0
 ```
 
+# Ansible
+Install ansible on the "control" laptop. And make sure the key to SSH is copied to the hosts.
+```sh
+pip3 install --user ansible
+```
+Then if the hosts are online you should be able to ping both at the same time with (if not executed from the _ansible-files_ folder, the full path to the inventory needs to be specified.
+```sh
+ansible -i inventory all -m ping
+```
+
+Now we can install the Adafruit python3 packages on all hosts (in the inventory file) with the following command assuming that you have the same sudo password on all hosts.
+```
+ansible-playbook -i inventory MyAnsiblePlays.yml -K
+```
+
 # Applications/Packages/Dependencies
 ```sh
 sudo pip3 install adafruit-blinka adafruit-circuitpython-rfm9x adafruit-circuitpython-busdevice
