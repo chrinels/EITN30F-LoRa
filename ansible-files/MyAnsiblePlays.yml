@@ -10,4 +10,10 @@
         requirements: /home/eitn30-pi/requirements.txt
         state: present
       become: True
+    - name: copy lora test files
+      copy:
+        src: "{{ item  }}"
+        dest: /home/eitn30-pi/lora_python/
+      with_fileglob:
+        - "../test_scripts/*"
 ...
