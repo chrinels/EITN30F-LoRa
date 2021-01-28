@@ -1,0 +1,9 @@
+---
+- hosts: all
+  tasks:
+    - name: adafruit packages
+      pip:
+        requirements: "requirements.txt"
+        state: present
+      become: True
+...

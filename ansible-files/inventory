@@ -1,0 +1,12 @@
+[all]
+inuti39.local
+inuti41.local
+
+[all:vars]
+ansible_python_interpreter=/usr/bin/python3
+
+[bs]
+inuti39.local
+
+[ue]
+inuti41.local
