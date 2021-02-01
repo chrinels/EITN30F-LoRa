@@ -1,19 +1,8 @@
 ---
-- hosts: all
-  tasks:
-    - name: copy requirements file
-      copy:
-        src: ./requirements.txt
-        dest: /home/eitn30-pi/requirements.txt
-    - name: adafruit packages
-      pip:
-        requirements: /home/eitn30-pi/requirements.txt
-        state: present
-      become: True
-    - name: copy lora test files
-      copy:
-        src: "{{ item  }}"
-        dest: /home/eitn30-pi/lora_python/
-      with_fileglob:
-        - "../test_scripts/*"
+- name: Install the pip requirements and copy python files
+  hosts: all
+  remote_user: eitn30-pi
+
+  roles:
+    - common
 ...
