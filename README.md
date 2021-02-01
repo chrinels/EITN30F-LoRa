@@ -32,7 +32,7 @@ ansible -i inventory all -m ping
 
 Now we can install the Adafruit python3 packages on all hosts (in the inventory file) with the following command assuming that you have the same sudo password on all hosts.
 ```
-ansible-playbook -i inventory MyAnsiblePlays.yml -K
+ansible-playbook -i hosts common.yml -K
 ```
 
 # Applications/Packages/Dependencies
