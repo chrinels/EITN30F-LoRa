@@ -1,6 +1,6 @@
 import signal
 import sys
-
+from socket import gethostname
 from logging import getLogger, getLevelName, Formatter, StreamHandler, log
 
 import adafruit_rfm9x
@@ -14,37 +14,42 @@ import RPi.GPIO as GPIO
 
 class LoRaNode:
 
-    def __init__(self, SPI: dict, RFM9x: dict, loglevel: str='NOTSET') -> None:
-        self._setUpLogging()
-        self._setLogLevel(loglevel)
+    def __init__(self, spi: dict, rfm9x: dict, name: str='', loglevel: str='ERROR') -> None:
+        # Initialize the logging 
+        self._set_up_logging(name)
+        self._set_log_level(loglevel)
 
-    def _setUpRFM9x(self) -> None:
+        # Now the actual radio
+        self._set_up_spi(spi)
+        self._set_up_rfm9x()
+
+    def _set_up_rfm9x(self) -> None:
         pass
 
-    def _setUpSPI(self) -> None:
-        pass
+    def _set_up_spi(self, spi: dict) -> None:
+        self.log.debug('Setting up SPI bus {}'.format(spi))
 
-    def _setUpLogging(self) -> None:
-        self.log = getLogger(name='LoRa')
-        log_formatter = Formatter("%(asctime)s [%(threadName)s][%(levelname)s] %(name)s: %(message)s ") # I am printing thread id here
+        try:
+            self.spi = busio.SPI(**{x: spi[x] for x in ['clock', 'MOSI', 'MISO']})
+        except KeyError:
+            self.log.error("The SPI dict must contain 'clock', 'MOSI', and 'MISO' keys.")
+            sys.exit(-1)
+
+
+    def _set_up_logging(self, name: str='') -> None:
+        self.log = getLogger(name='[{}] LoRa {}'.format(gethostname(), name))
+        log_formatter = Formatter("%(asctime)s [%(threadName)s][%(levelname)s]%(name)s: %(message)s ") # I am printing thread id here
         console_handler = StreamHandler()
         console_handler.setFormatter(log_formatter)
         self.log.addHandler(console_handler)
 
-    def _setLogLevel(self, level: str) -> None:
+    def _set_log_level(self, level: str) -> None:
         '''
-        Level       Numeric value
-        CRITICAL    50
-        ERROR       40
-        WARNING     30
-        INFO        20
-        DEBUG       10
-        NOTSET      0
+        Level name      CRITICAL    ERROR   WARNING     INFO    DEBUG   NOTSET
+        Numeric value   50          40      30          20      10      0    
         '''
-        if level is None:
-            level = 'NOTSET'
         self.log.setLevel(getLevelName(level))
-        self.log.debug('LogLevel set to {}'.format(level))
+        self.log.debug('LogLevel -> "{}"'.format(level))
 
 
 if __name__ == '__main__':
@@ -57,16 +62,13 @@ if __name__ == '__main__':
                 'channel': 0,
                 'irqpin': None,
                 'reset': dio.DigitalInOut(board.D4)
-
                 }
 
     RXSPI = {
             'MOSI':board.D20,
-            'MISO':board.D19,
+            #'MISO':board.D19,
             'clock':board.D21,
             'cs':dio.DigitalInOut(board.D17),
             }
 
-    node = LoRaNode(loglevel='DEBUG')
-
-
+    node = LoRaNode(RXSPI, RXRFM96, name='Rx', loglevel='ERROR')
