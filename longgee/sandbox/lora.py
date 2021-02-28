@@ -22,7 +22,6 @@ class LoRaNode:
         # Now the actual radio
         self.spi = self._set_up_spi(spi)
         self.radio = self._set_up_rfm9x(rfm9x)
-
         signal.signal(signal.SIGINT, self.default_signal_handler)
 
     def _set_up_logging(self, name: str='') -> Logger:
@@ -72,10 +71,19 @@ class LoRaNode:
         except KeyError:
             self.log.error("The SPI dict must contain 'clock', 'MOSI', and 'MISO' keys.")
             sys.exit(-1)
-
+    
     @property
-    def coding_rate(self, rate):
-        self.radio.coding_rate = rate
+    def coding_rate(self) -> int:
+        return self.radio.coding_rate
+
+    @coding_rate.setter
+    def coding_rate(self, rate: int) -> None:
+        if rate in set([5, 6, 7, 8]):
+            self.radio.coding_rate = rate
+            self.log.info('Coding rate set to {}'.format(rate))
+        else:
+            self.log.error('Coding rate NOT set. Desired rate {} is invalid. Valid values are [5, 6, 7, 8]'.format(rate))
+
 
 if __name__ == '__main__':
 
@@ -97,3 +105,4 @@ if __name__ == '__main__':
             }
 
     node = LoRaNode(RXSPI, RXRFM96, name='Rx', loglevel='DEBUG')
+    node.coding_rate = 8
