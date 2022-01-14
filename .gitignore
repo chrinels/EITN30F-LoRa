@@ -1,5 +1,8 @@
 .DS_Store
 Thumbs.db
+venv/
+venv/
+.idea/
 
 # Byte-compiled / optimized / DLL files
 __pycache__/
